@@ -1,0 +1,116 @@
+from PIL import Image
+
+def encrypt_image(image_path, operation, key):
+    """
+    Encrypts an image by applying a mathematical operation to each pixel.
+
+    Args:
+        image_path (str): The path to the image file.
+        operation (str): The mathematical operation to apply (e.g., 'add', 'subtract', 'multiply', 'divide').
+        key (int): The key value for the mathematical operation.
+
+    Returns:
+        Image: The encrypted image.
+    """
+    image = Image.open(image_path)
+    pixels = list(image.getdata())
+    encrypted_pixels = []
+
+    for pixel in pixels:
+        r, g, b = pixel
+        if operation == 'add':
+            r = (r + key) % 256
+            g = (g + key) % 256
+            b = (b + key) % 256
+        elif operation == 'subtract':
+            r = (r - key) % 256
+            g = (g - key) % 256
+            b = (b - key) % 256
+        elif operation == 'multiply':
+            r = (r * key) % 256
+            g = (g * key) % 256
+            b = (b * key) % 256
+        elif operation == 'divide':
+            r = (r // key) % 256
+            g = (g // key) % 256
+            b = (b // key) % 256
+        encrypted_pixels.append((r, g, b))
+
+    encrypted_image = Image.new(image.mode, image.size)
+    encrypted_image.putdata(encrypted_pixels)
+    return encrypted_image
+
+
+def decrypt_image(encrypted_image, operation, key):
+    """
+    Decrypts an encrypted image by applying the inverse mathematical operation to each pixel.
+
+    Args:
+        encrypted_image (Image): The encrypted image.
+        operation (str): The mathematical operation to apply (e.g., 'add', 'subtract', 'multiply', 'divide').
+        key (int): The key value for the mathematical operation.
+
+    Returns:
+        Image: The decrypted image.
+    """
+    pixels = list(encrypted_image.getdata())
+    decrypted_pixels = []
+
+    for pixel in pixels:
+        r, g, b = pixel
+        if operation == 'add':
+            r = (r - key) % 256
+            g = (g - key) % 256
+            b = (b - key) % 256
+        elif operation == 'subtract':
+            r = (r + key) % 256
+            g = (g + key) % 256
+            b = (b + key) % 256
+        elif operation == 'multiply':
+            r = (r // key) % 256
+            g = (g // key) % 256
+            b = (b // key) % 256
+        elif operation == 'divide':
+            r = (r * key) % 256
+            g = (g * key) % 256
+            b = (b * key) % 256
+        decrypted_pixels.append((r, g, b))
+
+    decrypted_image = Image.new(encrypted_image.mode, encrypted_image.size)
+    decrypted_image.putdata(decrypted_pixels)
+    return decrypted_image
+
+
+def main():
+    while True:
+        print("Image Encryption Tool")
+        print("---------------------")
+        print("1. Encrypt an image")
+        print("2. Decrypt an image")
+        print("3. Quit")
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            image_path = input("Enter the image path: ")
+            operation = input("Enter the operation (add, subtract, multiply, divide): ")
+            key = int(input("Enter the key value: "))
+            encrypted_image = encrypt_image(image_path, operation, key)
+            encrypted_image.save("encrypted_image.png")
+            print("Encrypted image saved as encrypted_image.png")
+        elif choice == "2":
+            encrypted_image_path = input("Enter the encrypted image path: ")
+            operation = input("Enter the operation (add, subtract, multiply, divide): ")
+            key = int(input("Enter the key value: "))
+            encrypted_image = Image.open(encrypted_image_path)
+            decrypted_image = decrypt_image(encrypted_image, operation, key)
+            decrypted_image.save("decrypted_image.png")
+            print("Decrypted image saved as decrypted_image.png")
+        elif choice == "3":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+if __name__ == "__main__":
+    main()
